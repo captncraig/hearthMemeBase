@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>{{page.title}}</title>
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <style>
+        body,
+        html {
+            background: #fff;
+            color: #333;
+            font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%
+        }
+
+        body {
+            background: url({{page.bg}}) no-repeat 50%;
+            background-size: cover;
+            position: relative;
+            overflow: hidden
+        }
+
+        #main {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            cursor: pointer
+        }
+
+        .preload {
+            display: none
+        }
+
+        img.card {
+            position: absolute;
+            -webkit-user-drag: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none
+        }
+
+        .browserupgrade {
+            margin: .2em 0;
+            background: #ccc;
+            color: #000;
+            padding: .2em 0
+        }
+    </style>
+</head>
+
+<body>
+    <!--[if lt IE 10]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+  <![endif]-->
+    {% for img in page.cardImgs %}
+    <img class="preload" src="{{img}}"> {% endfor %}
+    <div id="main"></div>
+    <script src="howler.js"></script>
+    <script>
+        var howls = [];
+        var imgs = [];
+        {% for src in page.cardImgs %}imgs.push("{{src}}");
+        {% endfor %}{% for src in page.sounds %}howls.push(new Howl({ src: ["{{src}}"] }))
+        {% endfor %}
+        var probs = [];
+        {% for w in page.weights %}for(var i = 0; i<{{w}}; i++){probs.push({{forloop.index0}})}{% endfor %}
+        var main = document.getElementById("main");
+        function addImage(a) {
+            var e = a.clientX
+            var n = a.clientY
+            var t = document.createElement("img");
+            t.className = "card";
+            t.style.top = n - 198 + "px";
+            t.style.left = e - 143 + "px";
+            t.draggable = false;
+            t.ondragstart = function () {
+                return false;
+            };
+            main.appendChild(t);
+            var idx = probs[Math.floor(Math.random()*probs.length)];
+            if(a.shiftKey){
+                idx = imgs.length - 1;
+            }
+            t.src = imgs[idx];
+            howls[idx].play();
+        }
+        main.addEventListener("click", addImage);
+    </script>
+</body>
+
+</html>
